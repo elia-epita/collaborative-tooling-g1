@@ -23,14 +23,20 @@ jobs:
             [1]: https://github.com/peter-evans/create-or-update-comment
           reactions: '+1'
 
-
-comment-with-api:
-  runs-on: ubuntu-latest
-  steps:
-    -name: create comment with API
-     run: 
-      gh api \
-      -methode POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2026-03-10" \
-  /repos/$OWNER/$REPO/$issues/comments/COMMENT_ID
+  comment-with-api:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Create comment with API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "/repos/${REPOSITORY}/issues/${ISSUE_NUMBER}/comments" \
+            -f body="Comment created with the GitHub API."
